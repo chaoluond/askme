@@ -9,9 +9,17 @@ import {
     Text
 } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { sendTextToChatGPT } from './../Utilities/Chatgpt';
 
 const Home = () => {
     const [inputText, setInputText] = useState('');
+
+    // Function to handle the send action
+    const handleSend = () => {
+        // Implement what happens when the user presses send
+        console.log('Send:', inputText);
+    };
+
     return (
         <KeyboardAvoidingView
             style={styles.container}
@@ -20,7 +28,7 @@ const Home = () => {
             <View style={styles.inner}>
                 <Text>This is Home screen</Text>
             </View>
-            <TouchableOpacity activeOpacity={1} style={styles.inputContainer}>
+            <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Ask me anything"
@@ -28,13 +36,21 @@ const Home = () => {
                     value={inputText}
                     onChangeText={setInputText}
                 />
-                <MaterialCommunityIcons
-                    name="text-to-speech"
-                    size={30} // You can adjust the size as needed
-                    color="#333" // This is the icon color; change as needed
-                    style={styles.iconStyle}
-                />
-            </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    if (inputText.trim().length > 0) {
+                        // Call your send function here
+                        sendTextToChatGPT(inputText);
+                        setInputText(''); // Clear text input after sending
+                    }
+                }}>
+                    <MaterialCommunityIcons
+                        name={inputText.trim().length > 0 ? 'send' : 'text-to-speech'}
+                        size={30}
+                        color="#000"
+                        style={styles.iconStyle}
+                    />
+                </TouchableOpacity>
+            </View>
         </KeyboardAvoidingView>
     );
 }
@@ -65,6 +81,10 @@ const styles = StyleSheet.create({
     },
     iconStyle: {
         padding: 10,
+    },
+    sendText: {
+        color: '#333', // Example send button text color, adjust as needed
+        fontSize: 16,
     },
 });
 
