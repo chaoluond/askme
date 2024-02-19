@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { genTaskPrompt } from './Constants';
 const openAiApiKey = 'your-openai-key'; // Replace with your actual API key
-const engineId = 'gpt-4'; // Specify the correct engine ID for your use case
+const engineId = 'gpt-4-0125-preview'; // Specify the correct engine ID for your use case
 
 const openai = new OpenAI({ apiKey: openAiApiKey });
 
