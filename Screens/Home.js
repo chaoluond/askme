@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { sendTextToChatGPT } from './../Utilities/Chatgpt';
+import { addReminder } from './../Utilities/ReminderUtilities';
+import { useReminders } from '../RemindersContext'; // Import the hook
 
 const Header = ({ onExit }) => (
     <View style={styles.headerContainer}>
@@ -26,8 +28,9 @@ const Home = () => {
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState([]);
     const [isInChat, setIsInChat] = useState(false);
+    const { reminders, setReminders } = useReminders();
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (inputText.trim().length > 0) {
             // Add new message to the messages array
             const newMessage = {
@@ -38,7 +41,52 @@ const Home = () => {
             setMessages([...messages, newMessage]);
             setInputText(''); // Clear text input after sending
             setIsInChat(true);
-            // You would also want to handle the bot response here
+
+            // Wait for the bot's response
+            let ResponseTextDisplay = '';
+            try {
+                const botResponseText = await sendTextToChatGPT(inputText);
+
+                // process reponse
+                if (botResponseText.startsWith("who:")) {
+                    // Regular expressions to match each line
+                    const whoRegex = /who:\s*(.*)/;
+                    const whatRegex = /what:\s*(.*)/;
+                    const whereRegex = /where:\s*(.*)/;
+                    const whenRegex = /when:\s*(.*)/;
+                    const taskRegex = /Task 1:\s*(.*)/;
+
+                    // Use match method to extract information
+                    let who = botResponseText.match(whoRegex)?.[1];
+                    let what = botResponseText.match(whatRegex)?.[1];
+                    let where = botResponseText.match(whereRegex)?.[1];
+                    let when = botResponseText.match(whenRegex)?.[1];
+                    let task = botResponseText.match(taskRegex)?.[1];
+                    if (who == 'Tom') {
+                        who = 'User';
+                        task = task.replace('Tom', 'User');
+                    }
+
+                    ResponseTextDisplay = `Reminder: ${task} \nwho: ${who} \nwhat: ${what} \nwhere: ${where} \nwhen: ${when}`;
+                    reminderData = [task, who, what, where, when];
+                    addReminder(reminders, setReminders, reminderData);
+                }
+                else {
+                    ResponseTextDisplay = botResponseText;
+                }
+
+                // Add bot response to the messages array
+                const botMessage = {
+                    id: Date.now().toString(),
+                    text: ResponseTextDisplay,
+                    sender: 'chatgpt',
+                };
+
+                setMessages(messages => [...messages, botMessage]);
+            } catch (error) {
+                console.error("Failed to get bot response:", error);
+                // Optionally handle errors, e.g., show an error message
+            }
         }
     };
 

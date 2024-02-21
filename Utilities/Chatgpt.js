@@ -21,9 +21,8 @@ const sendTextToChatGPT = async (inputText) => {
             ],
             model: engineId,
         });
-        console.log(inputText);
-
         console.log(completion.choices[0]['message']['content']);
+        return completion.choices[0]['message']['content'];
     } catch (error) {
         console.error('There was an error:', error);
     }
