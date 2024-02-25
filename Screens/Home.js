@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     Text,
     FlatList,
-    Keyboard
+    Keyboard,
+    Image
 } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { sendTextToChatGPT } from './../Utilities/Chatgpt';
@@ -114,7 +115,10 @@ const Home = () => {
             {isInChat && <Header onExit={resetMessages} />}
             {!isInChat && (
                 <View style={styles.inner}>
-                    <Text>This is Home screen</Text>
+                    <Image
+                        source={require('./../assets/ai_persona.jpeg')} // Update the path to where your image file is located
+                        style={styles.imageStyle}
+                    />
                 </View>
             )}
             <FlatList
@@ -152,6 +156,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center', // Add this line
+        paddingTop: 55,
     },
     inputContainer: {
         flexDirection: 'row', // Align TextInput and Icon horizontally
@@ -171,10 +176,6 @@ const styles = StyleSheet.create({
     },
     iconStyle: {
         padding: 10,
-    },
-    sendText: {
-        color: '#333', // Example send button text color, adjust as needed
-        fontSize: 16,
     },
     messagesList: {
         flex: 1,
@@ -226,6 +227,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#000',
         fontWeight: 'bold',
+    },
+    imageStyle: {
+        width: 300, // Set the width as you prefer
+        height: 300, // Set the height as you prefer
+        resizeMode: 'contain', // This makes sure the entire image fits within the width and height specified
     },
 });
 
