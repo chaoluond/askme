@@ -25,18 +25,25 @@ const Header = ({ onExit }) => (
     </View>
 );
 
+const textBoxData = [
+    { id: 'reminder', text: 'Create a reminder for me' },
+    { id: 'event', text: 'Help me to create an event' },
+    { id: 'weather', text: 'Tell me about the weather' },
+];
+
 const Home = () => {
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState([]);
     const [isInChat, setIsInChat] = useState(false);
     const { reminders, setReminders } = useReminders();
 
-    const sendMessage = async () => {
-        if (inputText.trim().length > 0) {
+    const sendMessage = async (text) => {
+        console.log(text);
+        if (text && text.trim().length > 0) {
             // Add new message to the messages array
             const newMessage = {
                 id: Date.now().toString(), // Unique ID for the key prop
-                text: inputText,
+                text: text,
                 sender: 'user', // or 'bot' for bot responses
             };
             setMessages([...messages, newMessage]);
@@ -46,7 +53,7 @@ const Home = () => {
             // Wait for the bot's response
             let ResponseTextDisplay = '';
             try {
-                const botResponseText = await sendTextToChatGPT(inputText);
+                const botResponseText = await sendTextToChatGPT(text);
 
                 // process reponse
                 if (botResponseText.startsWith("who:")) {
@@ -91,6 +98,11 @@ const Home = () => {
         }
     };
 
+    const sendMessageWithText = async (text) => {
+        setInputText(text); // Set the text to the inputText state
+        await sendMessage(text); // Call the existing sendMessage function
+    };
+
     const renderMessageItem = ({ item }) => {
         return (
             <View style={styles.messageBubble(item.sender)}>
@@ -117,8 +129,9 @@ const Home = () => {
                 <View style={styles.inner}>
                     <Image
                         source={require('./../assets/ai_persona.jpeg')} // Update the path to where your image file is located
-                        style={styles.imageStyle}
+                        style={styles.profileImage}
                     />
+                    <Text style={styles.textBelowImage}>What can I do for you?</Text>
                 </View>
             )}
             <FlatList
@@ -127,6 +140,15 @@ const Home = () => {
                 keyExtractor={item => item.id}
                 style={styles.messagesList}
             />
+            {!isInChat && (
+                <View style={styles.textBoxContainer}>
+                    {textBoxData.map((box) => (
+                        <TouchableOpacity key={box.id} style={styles.textBox} onPress={() => sendMessageWithText(box.text)}>
+                            <Text style={styles.textBoxText}>{box.text}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.textInput}
@@ -135,7 +157,7 @@ const Home = () => {
                     value={inputText}
                     onChangeText={setInputText}
                 />
-                <TouchableOpacity onPress={sendMessage}>
+                <TouchableOpacity onPress={() => sendMessage(inputText)}>
                     <MaterialCommunityIcons
                         name={inputText.trim().length > 0 ? 'send' : 'text-to-speech'}
                         size={30}
@@ -156,7 +178,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center', // Add this line
-        paddingTop: 55,
+        paddingTop: 100,
     },
     inputContainer: {
         flexDirection: 'row', // Align TextInput and Icon horizontally
@@ -228,10 +250,41 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
     },
-    imageStyle: {
-        width: 300, // Set the width as you prefer
-        height: 300, // Set the height as you prefer
-        resizeMode: 'contain', // This makes sure the entire image fits within the width and height specified
+    profileImage: {
+        width: 200, // set the width of the image
+        height: 200, // set the height of the image
+        borderRadius: 100, // make it round
+        marginBottom: 20, // space below the image
+    },
+    textBelowImage: {
+        fontSize: 18,
+        color: '#000',
+        marginBottom: 10, // space below the text
+        fontWeight: 'bold',
+    },
+    textBoxContainer: {
+        alignSelf: 'flex-start', // Align container to the left side
+        marginLeft: 20, // Spacing from the left side of the screen
+    },
+    textBox: {
+        backgroundColor: '#F0F0F0', // Light grey background
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 20, // Rounded corners
+        marginVertical: 10, // Space between the boxes
+        // Shadow properties for iOS
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        // Elevation for Android (drop shadow effect)
+        elevation: 3,
+    },
+    textBoxText: {
+        fontSize: 16,
+        color: '#000', // Black text color
+        fontStyle: 'italic', // Make text italic
+        textAlign: 'left', // Align text to the left
     },
 });
 
