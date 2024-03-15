@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/askme.jpg" alt="Description of Image" width="600">
+  <img src="assets/askme.jpg" alt="Description of Image" width="300">
 </p>
 
 # AI Powered Personal Assistant
