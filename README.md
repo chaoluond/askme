@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/askme.jpeg" alt="Description of Image" width="600">
+</p>
+
 # AI Powered Personal Assistant
 
 Mission & Vision: Support people in accomplishing daily tasks and building a better life
